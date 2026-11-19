@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UTSA — Until The Subtitle Appears</title>
+<meta name="description" content="UTSA — авторский проект: учим иностранный язык через фильмы и мультфильмы. Тест на уровень, подборки фильмов и фразы с произношением.">
+<style>
+  :root{
+    --bg:#12141c; --card:#1c2030; --card2:#242a3d; --text:#eef1f8; --muted:#9aa3b8;
+    --accent:#ffb454; --accent2:#5ad1c8; --danger:#ff7a7a; --radius:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,Arial,sans-serif;line-height:1.6}
+  header{padding:36px 20px 10px;text-align:center;cursor:pointer;user-select:none}
+  header h1{font-size:clamp(26px,4vw,42px);letter-spacing:1px}
+  header h1 span{color:var(--accent)}
+  header p{color:var(--muted);max-width:640px;margin:10px auto 0}
+  nav{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;padding:18px 10px;position:sticky;top:0;background:rgba(18,20,28,.92);backdrop-filter:blur(6px);z-index:50}
+  nav button{background:var(--card);border:1px solid #313a55;color:var(--text);padding:9px 16px;border-radius:999px;cursor:pointer;font-size:14px}
+  nav button.active{background:var(--accent);color:#20242f;border-color:var(--accent);font-weight:600}
+  main{max-width:1000px;margin:0 auto;padding:20px}
+  section{display:none;animation:fade .3s}
+  section.show{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  h2{margin:18px 0 12px;font-size:24px}
+  h3{margin:16px 0 8px;color:var(--accent2)}
+  .card{background:var(--card);border-radius:var(--radius);padding:18px 20px;margin:14px 0;border:1px solid #2b3350}
+  .badge{display:inline-block;padding:3px 12px;border-radius:999px;font-size:13px;font-weight:600;margin-right:8px}
+  .bA1{background:#3a5a3f;color:#a8f0b4}.bA2{background:#3d5a5a;color:#a4ecf0}
+  .bB1{background:#5a513a;color:#f0df9d}.bB2{background:#5a3a3a;color:#f0b0a4}
+  .muted{color:var(--muted);font-size:14px}
+  /* тест */
+  .q{margin:16px 0;padding:14px;background:var(--card2);border-radius:var(--radius)}
+  .opt{display:block;margin:6px 0;padding:10px 14px;border-radius:10px;border:1px solid #3a4468;cursor:pointer;background:transparent;color:var(--text)}
+  .opt.sel{border-color:var(--accent);background:#3a3323}
+  .btn{background:var(--accent);color:#20242f;border:none;padding:12px 26px;border-radius:10px;font-size:16px;font-weight:600;cursor:pointer;margin-top:10px}
+  .btn:disabled{opacity:.4;cursor:not-allowed}
+  .btn.ghost{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+  #result{margin-top:16px;padding:18px;border-radius:var(--radius);background:linear-gradient(135deg,#2c3450,#253048);display:none}
+  /* фильмы */
+  .movie{background:var(--card);border-radius:var(--radius);margin:14px 0;border:1px solid #2b3350;overflow:hidden}
+  .movie-head{padding:14px 18px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:10px}
+  .movie-head b{font-size:17px}
+  .movie-body{display:none;padding:0 18px 16px}
+  .movie.open .movie-body{display:block}
+  table{width:100%;border-collapse:collapse;margin-top:10px;font-size:15px}
+  th,td{padding:8px 10px;border-bottom:1px solid #2e3654;text-align:left;vertical-align:top}
+  th{color:var(--accent2);font-weight:600}
+  .say{background:none;border:1px solid var(--accent2);color:var(--accent2);border-radius:8px;padding:3px 10px;cursor:pointer;font-size:13px;white-space:nowrap}
+  .say:active{background:var(--accent2);color:#152220}
+  /* редактор */
+  #editor{display:none;background:var(--card2);border:1px solid var(--accent);border-radius:var(--radius);padding:16px;margin:16px 0}
+  #editor input,#editor select,#editor textarea{width:100%;padding:9px;border-radius:8px;border:1px solid #465075;background:#141826;color:var(--text);margin:5px 0}
+  .steps li{margin:8px 0}
+  footer{padding:26px;text-align:center;color:var(--muted);font-size:13px}
+  .tag{color:var(--accent2);font-size:13px}
+  .hint{background:#2a2417;border:1px dashed var(--accent);border-radius:10px;padding:10px 14px;margin:10px 0;font-size:14px;color:#f4e2bd}
+</style>
+</head>
+<body>
+
+<header id="logo">
+  <h1>UTSA · <span>Until The Subtitle Appears</span></h1>
+  <p>Авторский проект о том, как учить иностранный язык с помощью фильмов и мультфильмов. Пройдите тест, выберите свой уровень — а дальше только вы, наушники и пульт.</p>
+</header>
+
+<nav>
+  <button data-s="home" class="active">Главная</button>
+  <button data-s="test">Тест на уровень</button>
+  <button data-s="movies">Фильмы по уровням</button>
+  <button data-s="method">Методика UTSA</button>
+</nav>
+
+<main>
+
+<!-- ГЛАВНАЯ -->
+<section id="home" class="show">
+  <div class="card">
+    <h2>Почему именно кино?</h2>
+    <p>Учебник даёт вам язык «в вакууме», а фильм даёт живую речь: с интонацией, эмоцией, сленгом и фоновым гулом кафе. Мозг запоминает фразу из сцены гораздо крепче, чем фразу из упражнения — потому что у неё есть лицо, музыка и момент, когда её хочется сказать самому.</p>
+    <p class="muted" style="margin-top:8px">Схема простая: <b>смотрите</b> → ловите фразу → слушаете её произношение здесь → возвращаетесь к фильму. Каждая карточка фразы ниже озвучивается кнопкой.</p>
+  </div>
+  <div class="card">
+    <h2>С чего начать</h2>
+    <ul class="steps">
+      <li>Пройдите <b>Тест на уровень</b> — 12 вопросов, 5 минут.</li>
+      <li>Откройте свой раздел в «Фильмах по уровням».</li>
+      <li>Выберите фильм, который вы бы посмотрели и на русском — интерес важнее «полезности».</li>
+      <li>Разберите фразы из карточки фильма <b>до</b> просмотра: ухо будет узнавать их в потоке речи.</li>
+      <li>Смотрите первый раз с субтитрами, второй — без (или наоборот: уровни A1/A2 — всегда с).</li>
+    </ul>
+  </div>
+  <div class="hint">💡 Совет автора сайта: не останавливайте фильм на каждом незнакомом слове. Сначала — смысл сцены, потом — слова. Слова дойдут сами.</div>
+</section>
+
+<!-- ТЕСТ -->
+<section id="test">
+  <h2>Тест: какой у вас уровень?</h2>
+  <p class="muted">12 вопросов. Отвечайте честно: «думаю об этом больше минуты» — значит, честный ответ «не знаю». В конце получите уровень и рекомендацию, какой раздел фильмов открыть.</p>
+  <div id="questions"></div>
+  <button class="btn" id="finishBtn">Показать результат</button>
+  <div id="result"></div>
+</section>
+
+<!-- ФИЛЬМЫ -->
+<section id="movies">
+  <h2>Подборки по уровням</h2>
+  <p class="muted">Нажмите на фильм, чтобы раскрыть карточку с фразами. Кнопка «произнести» озвучит фразу голосом вашего браузера. Каждому фильму можно добавить свои фразы — так карточка станет вашей личной копилкой.</p>
+  <div id="levels"></div>
+</section>
+
+<!-- МЕТОДИКА -->
+<section id="method">
+  <h2>Методика UTSA: «Правило трёх просмотров»</h2>
+  <div class="card">
+    <ol class="steps">
+      <li><b>Просмотр «на слух».</b> 15–20 минут эпизода без субтитров. Задача — не понять всё, а уловить интонацию: где герой злится, где шутит, где спрашивает.</li>
+      <li><b>Просмотр с субтитрами.</b> Смотрите снова, выписывайте 5–7 фраз, которые звучат «вкусно» и повторяются. Не 50 — усвоите 5.</li>
+      <li><b>Просмотр «в теннис».</b> Фраза прозвучала — поставьте паузу и повторите её вслух, копируя интонацию героя. Да, вы будете говорить с Голливудом по очереди.</li>
+    </ol>
+  </div>
+  <div class="card">
+    <h3>Правило 20 минут</h3>
+    <p>Регулярность важнее объёма. 20 минут фильма каждый день дают больше, чем 3 часа в воскресенье. Язык — это привычка уха, а ухо любит рутину.</p>
+  </div>
+  <div class="card">
+    <h3>Частые ошибки</h3>
+    <ul class="steps">
+      <li>Брать фильм уровня «выше на два» — вместо прогресса вы получите фрустрацию.</li>
+      <li>Читать субтитры как книгу. Глаза обгоняют уши, и через полгода вы прекрасно читаете по-английски и ноль понимаете на слух.</li>
+      <li>Выбирать «полезный» скучный фильм. Скука — лучший способ забросить учение.</li>
+      <li>Смотреть без повторения фраз. Пассивный запас не активируется сам.</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h3>Как поднимать уровень</h3>
+    <p>A1→A2: мультфильмы с простым диалогом. A2→B1: сериалы с бытовой речью. B1→B2: фильмы с сюжетом и акцентами. B2 и выше: добавляйте комментарии, подкасты и оригинальные субтитры выключенными.</p>
+  </div>
+</section>
+
+<!-- РЕДАКТОР (скрытый) -->
+<div id="editor">
+  <h3>🔒 Редактор владельца</h3>
+  <p class="muted">Добавляйте свои фразы к фильмам. Данные сохраняются локально в этом браузере.</p>
+  <select id="edMovie"></select>
+  <input id="edEn" placeholder="Фраза (на изучаемом языке)">
+  <input id="edTr" placeholder="Транскрипция (например: [har ə juː])">
+  <input id="edRu" placeholder="Как звучит, русскими буквами">
+  <input id="edCn" placeholder="Перевод">
+  <button class="btn" id="edSave">Добавить фразу</button>
+  <button class="btn ghost" id="edClose">Закрыть</button>
+  <div class="muted" style="margin-top:8px">Чтобы полностью редактировать сайт (тексты, фильмы, тест) — правьте файл index.html, блок SITE_DATA в начале &lt;script&gt;.</div>
+</div>
+
+</main>
+
+<footer>
+  UTSA — Until The Subtitle Appears. Сделано с любовью к кино и языкам. Все тексты сайта оригинальные.<br>
+  <span class="tag">© владелец проекта</span>
+</footer>
+
+<script>
+/* ============================================================
+   SITE_DATA — данные сайта. Владелец может править этот блок.
+   Структура: levels -> movies -> phrases[{en, tr, ru, cn}]
+   ============================================================ */
+const SITE_DATA = {
+  levels: [
+    {
+      id:"A1", name:"A1 — Старт", desc:"Вы знаете алфавит и «Hello». Начинаем с мультфильмов: медленная речь, простые слова, много повторов.",
+      movies:[
+        {title:"Peppa Pig («Свинка Пеппа»)", note:"Идеальный старт: короткие серии (5 минут), размеренная речь, бытовая лексика. Не смущайтесь — половина взрослых полиглотов начинала именно тут.",
+         phrases:[
+          {en:"Hello, I'm Peppa Pig.", tr:"[həˈloʊ aɪm ˈpɛpə pɪɡ]", ru:"хело́у айм ПЭ́па пиг", cn:"Привет, я Свинка Пеппа."},
+          {en:"This is my little brother George.", tr:"[ðɪs ɪz maɪ ˈlɪtl ˈbrʌðər dʒɔːrdʒ]", ru:"зис из май ЛИ́тл БРА́зэ джо́дж", cn:"Это мой младший брат Джордж."},
+          {en:"Let's play!", tr:"[lets pleɪ]", ru:"летс плЭЙ", cn:"Давай играть!"},
+          {en:"Very good!", tr:"[ˈvɛri ɡʊd]", ru:"ВЭ́ри гуд", cn:"Очень хорошо!"},
+          {en:"Time for bed!", tr:"[taɪm fər bɛd]", ru:"тайм фо бЭД", cn:"Время спать!"}
+         ]},
+        {title:"Finding Nemo («В поисках Немо»)", note:"Визуальный контекст компенсирует простоту сюжета: герои показывают то, что говорят.",
+         phrases:[
+          {en:"Just keep swimming.", tr:"[dʒʌst kiːp ˈswɪmɪŋ]", ru:"джаст кип СВИ́минг", cn:"Просто продолжай плыть."},
+          {en:"Fish are friends, not food.", tr:"[fɪʃ ɑːr frɛndz nɒt fuːd]", ru:"фиш ар ФРЭ́НДЗ, нот фуд", cn:"Рыбы — друзья, а не еда."},
+          {en:"Where are we going?", tr:"[wɛr ɑːr wi ˈɡoʊɪŋ]", ru:"вЭ́р ар уи ГО́уинг", cn:"Куда мы идём?"},
+          {en:"I can do it!", tr:"[aɪ kæn duː ɪt]", ru:"ай кэн ду ит", cn:"Я смогу!"}
+         ]}
+      ]
+    },
+    {
+      id:"A2", name:"A2 — Разговорный минимум", desc:"Вы понимаете медленную речь и можете пересказать сюжет. Время бытовой речи и живых диалогов.",
+      movies:[
+        {title:"Friends («Друзья»)", note:"Ситком с прозрачными диалогами. Смотрите по одной серии за раз — с юмором работать медленно и вдумчиво.",
+         phrases:[
+          {en:"How you doin'?", tr:"[haʊ juː ˈduːɪn]", ru:"ха́у ю ду́ин", cn:"Как дела? (коронная фраза Джоуи)"},
+          {en:"We were on a break!", tr:"[wi wɜːr ɒn ə breɪk]", ru:"уи УЭ́р он э БРЭ́ЙК", cn:"Мы были в ссоре! (мы расходились!)"},
+          {en:"Could this BE any more difficult?", tr:"[kʊd ðɪs biː ˈɛni mɔːr ˈdɪfɪkəlt]", ru:"куд зис БИ Э́ни мор ДИ́фикэлт", cn:"Неужели это МОЖЕТ быть ещё сложнее?"},
+          {en:"Pivot!", tr:"[ˈpɪvət]", ru:"ПИ́вэт", cn:"Поворачивай! (крутить!)"},
+          {en:"What are you talking about?", tr:"[wɒt ɑːr juː ˈtɔːkɪŋ əˈbaʊt]", ru:"УО́Т ар ю ТО́кинг эбА́ут", cn:"О чём ты?"}
+         ]},
+        {title:"Toy Story («История игрушек»)", note:"Речь чуть быстрее, чем в A1, но лексика остаётся бытовой и понятной по контексту.",
+         phrases:[
+          {en:"To infinity and beyond!", tr:"[tuː ɪnˈfɪnɪti ænd bɪˈjɒnd]", ru:"ту инФИ́нити энд биЙО́НД", cn:"В бесконечность и дальше!"},
+          {en:"You've got a friend in me.", tr:"[juːv ɡɒt ə frɛnd ɪn miː]", ru:"юв гот э ФРЭ́НД ин ми", cn:"У меня есть друг во мне (я тебе друг)."},
+          {en:"Reach for the sky!", tr:"[riːtʃ fər ðə skaɪ]", ru:"рич фо зэ скА́Й", cn:"Руки вверх! (до неба!)"},
+          {en:"That's not flying, that's falling with style.", tr:"[ðæts nɒt ˈflaɪɪŋ ðæts ˈfɔːlɪŋ wɪð staɪl]", ru:"зэтс нот ФЛА́инг, зэтс ФО́линг уиз стА́йл", cn:"Это не полёт, это падение со вкусом."}
+         ]}
+      ]
+    },
+    {
+      id:"B1", name:"B1 — Уверенный средний", desc:"Вы смотрите фильмы с субтитрами и понимаете суть. Задача — слушать естественный темп и забирать живые конструкции.",
+      movies:[
+        {title:"Forrest Gump («Форрест Гамп»)", note:"Медленный, чёткий юг США. Монологи Форреста — золотая жила простых, но глубоких фраз.",
+         phrases:[
+          {en:"Life is like a box of chocolates.", tr:"[laɪf ɪz laɪk ə bɒks əv ˈtʃɒklɪts]", ru:"лА́ЙФ из лА́ЙК э бокс ов ЧО́Клитс", cn:"Жизнь как коробка конфет."},
+          {en:"Stupid is as stupid does.", tr:"[ˈstjuːpɪd ɪz æz ˈstjuːpɪd dʌz]", ru:"СТЬЮ́пид из эз СТЬЮ́пид даз", cn:"Глуп тот, кто глупо поступает."},
+          {en:"Run, Forrest, run!", tr:"[rʌn ˈfɔːrɪst rʌn]", ru:"ран, ФО́ррист, ран!", cn:"Беги, Форрест, беги!"},
+          {en:"I'm not a smart man, but I know what love is.", tr:"[aɪm nɒt ə smɑːt mæn bət aɪ noʊ wɒt lʌv ɪz]", ru:"айм нот э смАрт мэн, бат ай но́у УО́Т лав из", cn:"Я не умный, но я знаю, что такое любовь."}
+         ]},
+        {title:"The Pursuit of Happyness («В погоне за счастьем»)", note:"Быстрая городская речь, деловой слой лексики: собеседования, работа, деньги.",
+         phrases:[
+          {en:"Don't ever let somebody tell you you can't do something.", tr:"[doʊnt ˈɛvər lɛt ˈsʌmbədi tɛl juː juː kænt duː ˈsʌmθɪŋ]", ru:"доунт Э́вэ лет СА́мбоди тел ю ю кАнт ду СА́мсинг", cn:"Никогда не позволяй никому говорить, что у тебя не получится."},
+          {en:"You got a dream, you gotta protect it.", tr:"[juː ɡɒt ə driːm juː ˈɡɒtə prəˈtɛkt ɪt]", ru:"ю гот э ДРИ́М, ю ГО́тэ проТЭ́КТ ит", cn:"Если у тебя есть мечта — защити её."},
+          {en:"It was right then that I started thinking about happiness.", tr:"[ɪt wɒz raɪt ðɛn ðæt aɪ ˈstɑːrtɪd ˈθɪŋkɪŋ əˈbaʊt ˈhæpinəs]", ru:"ит уоз рА́ЙТ зэн зэт ай СТА́ртид СИ́нкинг эбА́ут ХЭ́пинэс", cn:"Именно тогда я начал думать о счастье."}
+         ]}
+      ]
+    },
+    {
+      id:"B2", name:"B2 — Продвинутый", desc:"Смотрите без субтитров и ловите шутки. Пора на сложную речь: идиомы, акценты, скорость.",
+      movies:[
+        {title:"Sherlock (UK)", note:"Скоростная британская речь. Прекрасный тренажёр уха: Шерлок говорит быстрее, чем большинство носителей.",
+         phrases:[
+          {en:"Elementary, my dear Watson.", tr:"[ˌɛlɪˈmɛntri maɪ dɪər ˈwɒtsən]", ru:"элиМЭ́нтри, май диэ УО́тсон", cn:"Элементарно, мой дорогой Ватсон."},
+          {en:"The game is on!", tr:"[ðə ɡeɪm ɪz ɒn]", ru:"зэ гейм из он!", cn:"Игра началась!"},
+          {en:"When you have eliminated the impossible, whatever remains, however improbable, must be the truth.", tr:"[wɛn juː hæv ɪˈlɪmɪneɪtɪd ði ɪmˈpɒsəbl …]", ru:"уэн ю хэв илИ́минэйтид зи имПО́сэбл …", cn:"Отбросив невозможное, что останется — истина."}
+         ]},
+        {title:"The King's Speech («Король говорит!»)", note:"Королевская речь, аккуратная артикуляция. Плюс сам фильм — о том, как справиться с речевым барьером. Символично для нас.",
+         phrases:[
+          {en:"I have a voice!", tr:"[aɪ hæv ə vɔɪs]", ru:"ай хэв э вО́ЙС", cn:"У меня есть голос!"},
+          {en:"You have such perseverance.", tr:"[juː hæv sʌtʃ ˌpɜːsɪˈvɪərəns]", ru:"ю хэв сач ПЭ́рсивиэрэнс", cn:"Вы обладаете таким упорством."},
+          {en:"King who? I am not a king. I am a naval officer.", tr:"[kɪŋ huː …]", ru:"кин ху…", cn:"Какой король? Я не король, я офицер флота."}
+         ]}
+      ]
+    }
+  ]
+};
+
+const QUIZ = [
+  {q:"Вы слышите «Could you tell me where the nearest station is?» —", a:["Поняли сразу","Поняли, но пришлось подумать","Поймали только «station»","Ничего не поняли"], w:[3,2,1,0]},
+  {q:"«What do you do for a living?» — это вопрос про…", a:["работу","здоровье","хобби","погоду"], w:[3,3,1,0]},
+  {q:"Выберите правильное: «I ___ to the cinema yesterday».", a:["went","go","gone","going"], w:[3,0,1,0]},
+  {q:"Смотрю фильм на английском:", a:["только с субтитрами","с субтитрами и постоянно ставлю паузу","иногда без субтитров, суть ясна","свободно без субтитров"], w:[0,1,2,3]},
+  {q:"«I've been living here for three years» значит:", a:["я жил здесь 3 года (и уехал)","я живу здесь уже 3 года","я поеду сюда через 3 года","я хотел бы жить здесь 3 года"], w:[0,3,0,0]},
+  {q:"Сможете заказать кофе и спросить дорогу?", a:["да, легко","да, с запинками","по бумажке с фразами","нет"], w:[3,2,1,0]},
+  {q:"Мультфильм и сериал — какой вам ближе сейчас?", a:["мультфильм, иначе тяжело","оба норм","сериал интереснее","хочу что-то серьёзное, с акцентами"], w:[0,1,2,3]},
+  {q:"«She made up her mind» значит:", a:["она надумала (решила)","она наказана","она поправила макияж","она подняла голову"], w:[3,0,0,0]},
+  {q:"Как быстро читаете субтитры фильма?", a:["не успеваю за ними","успеваю, но устану","легко, почти не замечаю","смотрю вообще без субтитров"], w:[0,1,2,3]},
+  {q:"«It's up to you» —", a:["решать тебе","над тобой","выше тебя","до тебя"], w:[3,0,0,0]},
+  {q:"Сколько примерно слов вы знаете?", a:["до 500","до 1500","2000–4000","больше 4000"], w:[0,1,2,3]},
+  {q:"Фраза «I could use a hand» означает:", a:["мне нужна помощь","я мог бы помахать","я могу использовать руку","возьму себя в руки"], w:[3,0,0,0]}
+];
+
+let answers = new Array(QUIZ.length).fill(null);
+
+function renderQuiz(){
+  const c = document.getElementById("questions");
+  c.innerHTML = QUIZ.map((item,i)=>`
+    <div class="q"><b>${i+1}. ${item.q}</b>
+      ${item.a.map((opt,j)=>`<button class="opt" data-i="${i}" data-j="${j}">${opt}</button>`).join("")}
+    </div>`).join("");
+  c.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{
+    const i=+b.dataset.i, j=+b.dataset.j;
+    answers[i]=j;
+    c.querySelectorAll(`.opt[data-i="${i}"]`).forEach(x=>x.classList.remove("sel"));
+    b.classList.add("sel");
+  });
+}
+
+document.getElementById("finishBtn").onclick = ()=>{
+  const res = document.getElementById("result");
+  if(answers.includes(null)){ res.style.display="block"; res.innerHTML="<b style='color:var(--danger)'>Ответьте на все вопросы 🙂</b>"; return; }
+  const score = answers.reduce((s,a,i)=>s+QUIZ[i].w[a],0);
+  const max = QUIZ.length*3;
+  const pct = score/max;
+  let level, advice, rec;
+  if(pct<0.3){level="A1"; advice="Начинаем с основ. Ничего страшного — у всех так было."; rec="A1";}
+  else if(pct<0.55){level="A2"; advice="База есть! Хватает бытовой речи, но нужно закрепить."; rec="A2";}
+  else if(pct<0.8){level="B1"; advice="Хорошее промежуточное владение. Тянемся к живой речи."; rec="B1";}
+  else {level="B2"; advice="Сильный уровень. Слушайте и говорите много, чтобы не растерять."; rec="B2";}
+  res.style.display="block";
+  res.innerHTML=`<span class="badge b${level}">${level}</span><b>Ваш примерный уровень: ${level}</b>
+  <p>${advice}</p>
+  <p>Рекомендуемый раздел: <b>${SITE_DATA.levels.find(l=>l.id===rec).name}</b> — он уже подсвечен в «Фильмах по уровням». <button class="btn ghost" onclick="goSection('movies')">Перейти →</button></p>`;
+  window.__rec = rec;
+};
+
+/* ---------- фильмы ---------- */
+function speak(text){
+  if(!window.speechSynthesis){alert("Браузер не поддерживает озвучку.");return;}
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text.replace(/\(.+?\)/g,""));
+  u.lang="en-US"; u.rate=0.9;
+  speechSynthesis.speak(u);
+}
+
+function userPhrases(){ try{return JSON.parse(localStorage.getItem("utsa_phrases")||"{}");}catch(e){return {};} }
+function saveUserPhrases(p){ localStorage.setItem("utsa_phrases", JSON.stringify(p)); }
+
+function renderMovies(){
+  const up = userPhrases();
+  const c = document.getElementById("levels");
+  c.innerHTML = SITE_DATA.levels.map(l=>`
+    <h3 class="lv-title" data-lv="${l.id}"><span class="badge b${l.id}">${l.id}</span> ${l.name.replace(/^A1 — |^A2 — |^B1 — |^B2 — /,"")}</h3>
+    <p class="muted" style="margin:6px 0 12px">${l.desc}</p>
+    ${l.movies.map((m,mi)=>{
+      const key = l.id+"|"+m.title;
+      const extra = up[key]||[];
+      return `<div class="movie" data-key="${key}">
+        <div class="movie-head"><b>${m.title}</b><span>▾</span></div>
+        <div class="movie-body">
+          <p class="muted">${m.note}</p>
+          <table><tr><th>Фраза</th><th>Транскрипция</th><th>На слух</th><th>Перевод</th><th></th></tr>
+          ${m.phrases.map(p=>`<tr><td>${p.en}</td><td>${p.tr}</td><td>${p.ru}</td><td>${p.cn}</td><td><button class="say">▶ произнести</button></td></tr>`).join("")}
+          ${extra.map(p=>`<tr><td>${p.en} <span class="tag">(ваша)</span></td><td>${p.tr||"—"}</td><td>${p.ru||"—"}</td><td>${p.cn||""}</td><td><button class="say">▶ произнести</button></td></tr>`).join("")}
+          </table>
+          <button class="btn ghost addPhrase" data-key="${key}" style="font-size:13px;padding:8px 16px">+ добавить свою фразу</button>
+        </div>
+      </div>`;
+    }).join("")}`).join("");
+
+  c.querySelectorAll(".movie-head").forEach(h=>h.onclick=()=>h.parentElement.classList.toggle("open"));
+  c.querySelectorAll(".say").forEach(b=>b.onclick=e=>{ e.stopPropagation(); speak(b.closest("tr").cells[0].textContent.replace(/\(ваша\)/,"")); });
+  c.querySelectorAll(".addPhrase").forEach(b=>b.onclick=()=>{ openEditor(b.dataset.key); });
+
+  if(window.__rec){
+    const target = c.querySelector(`.lv-title[data-lv="${window.__rec}"]`);
+    if(target){ target.scrollIntoView({behavior:"smooth"}); }
+  }
+}
+
+/* ---------- редактор ---------- */
+function fillMovieSelect(){
+  const s = document.getElementById("edMovie");
+  s.innerHTML = SITE_DATA.levels.flatMap(l=>l.movies.map(m=>`<option value="${l.id}|${m.title}">${l.id} · ${m.title}</option>`)).join("");
+}
+function openEditor(key){
+  const ed = document.getElementById("editor");
+  fillMovieSelect();
+  if(key) document.getElementById("edMovie").value = key;
+  ed.style.display="block";
+  ed.scrollIntoView({behavior:"smooth"});
+}
+document.getElementById("edClose").onclick = ()=>{ document.getElementById("editor").style.display="none"; };
+document.getElementById("edSave").onclick = ()=>{
+  const key = document.getElementById("edMovie").value;
+  const p = {en:document.getElementById("edEn").value.trim(), tr:document.getElementById("edTr").value.trim(),
+             ru:document.getElementById("edRu").value.trim(), cn:document.getElementById("edCn").value.trim()};
+  if(!p.en){alert("Введите фразу.");return;}
+  const all = userPhrases();
+  (all[key]=all[key]||[]).push(p);
+  saveUserPhrases(all);
+  ["edEn","edTr","edRu","edCn"].forEach(id=>document.getElementById(id).value="");
+  renderMovies();
+  document.querySelector(`.movie[data-key="${CSS.escape(key)}"]`)?.classList.add("open");
+};
+
+/* ---------- навигация ---------- */
+function goSection(id){
+  document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("active", b.dataset.s===id));
+  document.querySelectorAll("main section").forEach(s=>s.classList.toggle("show", s.id===id));
+  window.scrollTo({top:0});
+}
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>goSection(b.dataset.s));
+
+/* секрет: 3 клика по логотипу открывают редактор */
+let clicks=0, timer=null;
+document.getElementById("logo").onclick=()=>{
+  clearTimeout(timer); clicks++;
+  timer=setTimeout(()=>clicks=0, 800);
+  if(clicks>=3){ clicks=0; openEditor(null); }
+};
+
+renderQuiz();
+renderMovies();
+</script>
+</body>
+</html>
